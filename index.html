@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For you....</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* --- General and Font Imports --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        /* Script/Handwriting font for the worn theme */
+        @import url('https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&display=swap');
+
+        /* --- Theme Variables --- */
+        :root {
+            /* General Background */
+            --bg-start: #f7f3e8;
+            /* Light Sepia */
+            --bg-end: #fce7f3;
+            /* Light Pink/Sepia */
+
+            /* Worn Paper Theme Colors */
+            --worn-bg: #f7f3e8;
+            /* Off-white, slightly yellowed */
+            --worn-text: #5d4037;
+            /* Dark brown text for ink */
+            --worn-accent: #c0a87f;
+            /* Rough stitching or worn edge */
+            --worn-button-bg: #8d6e63;
+            /* Medium Brown */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--worn-text);
+        }
+
+        /* --- Page Management --- */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 1.5rem;
+            animation: fadeIn 0.5s ease-out;
+            max-width: 100vw;
+            z-index: 20;
+            position: relative;
+        }
+
+        .active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Worn Paper Styles (Applied to ALL pages) --- */
+        .worn-container {
+            background-color: var(--worn-bg);
+            border: 1px solid var(--worn-accent);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), inset 0 0 50px rgba(255, 255, 200, 0.3);
+            line-height: 1.8;
+            font-family: 'Tangerine', cursive;
+            font-size: 2.2rem;
+            color: var(--worn-text);
+            position: relative;
+            filter: sepia(0.1) saturate(1.1);
+            z-index: 20;
+        }
+
+        .worn-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 5px dashed var(--worn-accent);
+            z-index: -1;
+            opacity: 0.5;
+        }
+
+        .worn-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--worn-text);
+            padding-bottom: 10px;
+            color: var(--worn-text);
+        }
+
+        /* Ensures normal text (like Tailwind elements) uses a standard font */
+        .worn-container * {
+            color: inherit;
+        }
+
+        .worn-container .inter-font {
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            color: #333;
+            /* Darker color for readability */
+        }
+
+        /* --- Enhanced Cake Styles --- */
+        .cake-container {
+            position: relative;
+            margin: 40px auto;
+            width: 280px;
+            height: 180px;
+            border-radius: 5px 5px 0 0;
+            box-shadow: 0 5px 0 #90a4ae;
+            z-index: 1;
+            transform: scale(0.9);
+        }
+
+        .cake-layer {
+            position: absolute;
+            width: 100%;
+            border-radius: 5px 5px 0 0;
+            box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.1);
+            z-index: 2;
+        }
+
+        .cake-layer.layer-bottom {
+            top: 100px;
+            height: 80px;
+            background: #f8bbd0;
+            /* Cake base color */
+            border-bottom: 5px solid #d81b60;
+        }
+
+        .cake-layer.layer-middle {
+            top: 55px;
+            height: 45px;
+            background: #fff;
+            /* Cream/Vanilla layer */
+            border-bottom: 5px solid #e0f0f5;
+        }
+
+        .cake-layer.layer-top {
+            top: 0;
+            height: 55px;
+            background: #ffcdd2;
+            /* Pink frosting */
+            border-bottom: 5px solid #e91e63;
+        }
+
+
+        /* FIX: Adjusted alignment to ensure candles sit correctly on the cake surface */
+        #candles-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            /* Key change: Align items to the bottom of the layer-top container */
+            align-items: flex-end;
+            padding-bottom: 5px;
+            /* Small padding so they sit just on the surface */
+        }
+
+        .single-candle {
+            width: 12px;
+            height: 40px;
+            background: #fff;
+            margin: 0 8px;
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.5s;
+        }
+
+        .flame {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 16px;
+            height: 16px;
+            background: #ff5722;
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 5px #ffd700;
+            animation: flicker 1s infinite alternate;
+            transition: opacity 0.3s;
+        }
+
+        .flame.off {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.5);
+        }
+
+        @keyframes flicker {
+            0% {
+                transform: translateX(-50%) scale(1);
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: translateX(-50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        /* --- Other Animations & Styles (Unchanged) --- */
+
+        @keyframes pulse {
+            /* ... */
+        }
+
+        @keyframes float {
+            /* ... */
+        }
+    </style>
+</head>
+
+<body class="selection:bg-pink-300 selection:text-white" onclick="tryPlayMusic()">
+
+    <audio id="bg-music" loop preload="auto">
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="init-page" class="page active">
+        <div class="worn-container w-full rounded-md p-8 md:p-12 max-w-xl text-center">
+            <div class="worn-title">A Message Just For You</div>
+            <div id="letter-body-content" class="space-y-6 text-left">
+                <p>Dear Pookie....</p>
+                <p class="mt-8">Happy Birthday.</p>
+                <p>
+                    We’ve known each other since 5th grade, and honestly, you’ve been a part of my life for so long that
+                    it’s impossible not to think about how much you still mean to me. You’re not the calm type — you’re
+                    lively,
+                    loud in a good way, and full of personality. And maybe that’s exactly why I’ve always remembered
+                    you.
+                </p>
+                <p>
+                    I’ll be real with you: these days, I feel this pull toward you more than ever. My time doesn’t feel
+                    right without you, and half the feelings I have for you… I still don’t know how to express them
+                    properly. But
+                    I do know one thing — I want to be around you, not just now, but for a long time. Maybe even
+                    forever, if life
+                    allows it.
+                </p>
+                <p>
+                    Will you hold my hand next time we meet? Unaku Vendam na vendam dha...perusua la eduthukaa matan
+                </p>
+                <p>Have an amazing year ahead, Pookiee...</p>
+                <p class="letter-signature text-right">— Yasir</p>
+            </div>
+        </div>
+
+        <script>
+            function willYouClick() {
+                alert("ahaaaa.... apdiyaaa nerlaa pakuran ena pandraa nu....");
+            }
+        </script>
+
+        <button
+            class="bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-12 rounded-full shadow-xl mt-8 transition duration-300 transform hover:scale-110 text-2xl"
+            onclick="willYouClick()">
+            Will you??
+        </button>
+
+        <button
+            class="next-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-8 rounded-full shadow-xl mt-4 transition duration-300 transform hover:scale-105"
+            onclick="showPage('homepage')">
+            Continue the Surprise!
+        </button>
+    </div>
+
+
+    <div id="homepage" class="page">
+        <div class="worn-container p-8 md:p-12 rounded-3xl shadow-2xl max-w-3xl w-full text-center">
+            <div class="flex flex-col sm:flex-row justify-center items-center mb-8 space-y-4 sm:space-y-0 sm:space-x-4">
+                <div class="text-4xl md:text-5xl font-extrabold p-3 rounded-xl shadow-md title-pulse flex items-center inter-font"
+                    style="background-color: var(--worn-accent); color: var(--worn-text); border: 2px solid var(--worn-text); font-size: 2rem;">
+                    Advance <span class="text-6xl ml-3">🐻</span> </div>
+                <div class="text-4xl md:text-5xl font-extrabold p-3 rounded-xl shadow-md title-pulse inter-font"
+                    style="background-color: var(--worn-accent); color: var(--worn-text); border: 2px solid var(--worn-text); font-size: 2rem;">
+                    Happy Birthday!</div>
+            </div>
+
+            <div class="mb-6" id="welcome-message" style="color: var(--worn-text); font-size: 3rem; font-weight: bold;">
+                Wishing You a Day Filled with Love and Joy!
+            </div>
+
+            <p class="mb-6 leading-relaxed inter-font">
+                On this special day Pookiee....
+                You’ve been special to me for a long time, more than you know.
+                Wishing you a year as bright as the way you make me feel.
+            </p>
+            <p class="text-lg font-medium mb-8" style="color: var(--worn-text);">
+                I'm so grateful to have you in my life and I can't wait to celebrate many more birthdays with you!
+            </p>
+            <p class="text-right font-semibold text-xl" id="signature"
+                style="color: var(--worn-text); font-size: 2.5rem;">
+                — Your friend, Yasir
+            </p>
+
+            <button
+                class="next-btn font-bold py-3 px-8 rounded-full shadow-xl mt-10 transition duration-300 transform hover:scale-105 opacity-100 inter-font"
+                id="homepage-next-btn" onclick="showPage('game-page')"
+                style="background-color: var(--worn-button-bg); color: white; font-size: 1.25rem;">
+                Ready for the Next Step?
+            </button>
+        </div>
+    </div>
+
+    <div id="game-page" class="page">
+        <div class="worn-container p-8 md:p-12 rounded-3xl shadow-2xl max-w-xl w-full text-center">
+            <h2 class="worn-title" style="font-size: 3rem;">Birthday Candle Challenge! 🎂</h2>
+            <p class="mb-6 inter-font">
+                Make a wish, and then **press and hold** the "Blow Breath" button to extinguish the candles! You need to
+                hold it down for a few seconds.
+            </p>
+
+            <div class="cake-container mx-auto relative mb-8">
+                <div class="cake-layer layer-bottom"></div>
+                <div class="cake-layer layer-middle"></div>
+                <div class="cake-layer layer-top">
+                    <div class="candle-container" id="candles-container">
+                    </div>
+                </div>
+            </div>
+
+            <button
+                class="game-btn bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-10 rounded-full shadow-lg transition duration-300 transform hover:scale-105 active:scale-95 inter-font"
+                id="blow-button" onmousedown="startBlowing()" ontouchstart="startBlowing()" onmouseup="stopBlowing()"
+                ontouchend="stopBlowing()">
+                Blow Breath!
+            </button>
+
+            <div id="blow-progress-bar"
+                class="w-full max-w-xs mx-auto mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div id="blow-fill" class="h-full bg-blue-500 transition-all duration-100" style="width: 0%;"></div>
+            </div>
+
+            <p id="game-message" class="mt-6 text-xl font-semibold text-gray-700 inter-font"
+                style="font-size: 1.25rem;">Start Blowing!</p>
+
+
+            <button
+                class="next-btn font-bold py-3 px-8 rounded-full shadow-xl mt-10 transition duration-300 transform hover:scale-105 hidden inter-font"
+                id="game-next-btn" onclick="showPage('memories-page')"
+                style="background-color: var(--worn-button-bg); color: white; font-size: 1.25rem;">
+                View Our Memory Book!
+            </button>
+        </div>
+    </div>
+
+    <div id="memories-page" class="page">
+        <div class="worn-container p-6 md:p-10 rounded-3xl shadow-2xl max-w-4xl w-full text-center">
+            <h2 class="worn-title" style="font-size: 2.5rem;">Countdown to the Real Day!</h2>
+
+            <div class="countdown bg-blue-100 p-4 rounded-xl shadow-md mx-auto mb-8 inter-font"
+                style="color: #333; background: #e0f2fe;">
+                <div class="countdown-timer flex justify-center gap-4">
+
+                    <div class="countdown-unit bg-blue-500 text-white p-3 rounded-lg min-w-[70px]">
+                        <div class="text-3xl font-bold" id="days">00</div>
+                        <div class="text-sm">Days</div>
+                    </div>
+
+                    <div class="countdown-unit bg-blue-500 text-white p-3 rounded-lg min-w-[70px]">
+                        <div class="text-3xl font-bold" id="hours">00</div>
+                        <div class="text-sm">Hours</div>
+                    </div>
+
+                    <div class="countdown-unit bg-blue-500 text-white p-3 rounded-lg min-w-[70px]">
+                        <div class="text-3xl font-bold" id="minutes">00</div>
+                        <div class="text-sm">Minutes</div>
+                    </div>
+
+                    <div class="countdown-unit bg-blue-500 text-white p-3 rounded-lg min-w-[70px]">
+                        <div class="text-3xl font-bold" id="seconds">00</div>
+                        <div class="text-sm">Seconds</div>
+                    </div>
+
+                </div>
+            </div>
+            <h2 class="worn-title" style="font-size: 3rem;">Our Special Memories Photo Album</h2>
+            <div class="memory-photos grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 inter-font">
+
+                <div
+                    class="memory-photo bg-pink-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="1.jpeg" alt="Memory Photo 1" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Nama first photo</span>
+                </div>
+                <div
+                    class="memory-photo bg-blue-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="2.jpeg" alt="Memory Photo 2" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Adhe dha meendum</span>
+                </div>
+                <div
+                    class="memory-photo bg-yellow-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="3.jpeg" alt="Memory Photo 3" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Anike eduthathu dha</span>
+                </div>
+                <div
+                    class="memory-photo bg-green-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="4.jpeg" alt="Memory Photo 4" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Indha photo epo nu thrla</span>
+                </div>
+                <div
+                    class="memory-photo bg-indigo-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="5.jpeg" alt="Memory Photo 5" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Therijaa solu</span>
+                </div>
+                <div
+                    class="memory-photo bg-red-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="6.jpeg" alt="Memory Photo 6" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Idhula Kamal alaga irukum</span>
+                </div>
+                <div
+                    class="memory-photo bg-teal-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="7.jpeg" alt="Memory Photo 7" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Idhum epo nu thrla</span>
+                </div>
+                <div
+                    class="memory-photo bg-purple-100 p-1 rounded-xl shadow-md aspect-square flex flex-col justify-center items-center transition transform hover:scale-105">
+                    <img src="8.jpeg" alt="Memory Photo 8" class="w-full h-full object-cover rounded-lg">
+                    <span class="image-label">Idhan kadisiya eduthathu</span>
+                </div>
+            </div>
+
+            <h3 class="mt-10" style="color: var(--worn-text); font-size: 3rem; font-weight: bold;">
+                That's all for now! See you on the 6th! ❤️
+            </h3>
+        </div>
+    </div>
+
+
+    <script>
+        // --- GLOBAL STATE ---
+        const NUM_CANDLES = 5;
+        let candlesBlown = 0;
+        let blowProgress = 0;
+        let isBlowing = false;
+        let blowInterval = null;
+        let musicPlayed = false;
+
+        // --- MUSIC FIX ---
+        /** Attempts to play the music on ANY user click/tap. */
+        function tryPlayMusic() {
+            if (musicPlayed) return;
+            document.getElementById('bg-music').play().then(() => {
+                musicPlayed = true;
+                // Optional: remove the body listener once music starts successfully
+                document.body.onclick = null;
+            }).catch(e => {
+                // If playback is still blocked, we leave the listener to catch the next click.
+                console.log('Music playback failed. Waiting for next user click.');
+            });
+        }
+
+
+        // --- UTILITY FUNCTIONS ---
+
+        /** Switches the active page. */
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        // --- ANIMATIONS & VISUALS (Balloon logic) ---
+        function createBalloons() {
+            const colors = ['#ff4081', '#4caf50', '#2196f3', '#ff9800', '#9c27b0', '#ffeb3b', '#00bcd4', '#e91e63', '#8bc34a', '#ff5722'];
+            const container = document.body;
+            for (let i = 0; i < 50; i++) {
+                const balloon = document.createElement('div');
+                balloon.className = 'balloon';
+                balloon.style.left = Math.random() * 100 + 'vw';
+                balloon.style.background = colors[Math.floor(Math.random() * colors.length)];
+                balloon.style.animationDuration = (10 + Math.random() * 10) + 's';
+                balloon.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(balloon);
+            }
+        }
+
+        // --- GAME LOGIC (Candle Blowing) ---
+
+        /** Generates candles dynamically for the game page. */
+        function generateCandles() {
+            const container = document.getElementById('candles-container');
+            container.innerHTML = '';
+            for (let i = 0; i < NUM_CANDLES; i++) {
+                const candleDiv = document.createElement('div');
+                candleDiv.className = 'single-candle shadow-md';
+                candleDiv.style.background = i % 2 === 0 ? '#fdd835' : '#ff8a65';
+                candleDiv.innerHTML = '<div class="flame"></div>';
+                container.appendChild(candleDiv);
+            }
+        }
+
+        /** Starts the continuous blowing effect when the button is pressed. */
+        function startBlowing() {
+            if (candlesBlown >= NUM_CANDLES) return;
+            isBlowing = true;
+            document.getElementById('game-message').textContent = 'Blowing... Keep Holding!';
+
+            if (blowInterval) clearInterval(blowInterval);
+            blowInterval = setInterval(() => {
+                if (!isBlowing) return;
+                blowProgress += 5;
+                if (blowProgress > 100) blowProgress = 100;
+                document.getElementById('blow-fill').style.width = blowProgress + '%';
+
+                if (blowProgress >= 20 && candlesBlown < NUM_CANDLES) {
+                    extinguishNextCandle();
+                    blowProgress = 0;
+                }
+            }, 100);
+        }
+
+        /** Stops the blowing effect when the button is released. */
+        function stopBlowing() {
+            isBlowing = false;
+            clearInterval(blowInterval);
+            blowInterval = null;
+
+            if (candlesBlown < NUM_CANDLES) {
+                document.getElementById('game-message').textContent = 'Oops! Keep holding to blow them all out.';
+            }
+        }
+
+        /** Extinguishes one candle and checks win condition. */
+        function extinguishNextCandle() {
+            const candles = document.querySelectorAll('.single-candle');
+            if (candlesBlown < NUM_CANDLES) {
+                const candle = candles[candlesBlown];
+                candle.querySelector('.flame').classList.add('off');
+                candlesBlown++;
+
+                if (candlesBlown < NUM_CANDLES) {
+                    document.getElementById('game-message').textContent = `Candles out: ${candlesBlown}/${NUM_CANDLES}. Keep going!`;
+                } else {
+                    document.getElementById('game-message').textContent = `CONGRATULATIONS! You blew out all ${NUM_CANDLES} candles!`;
+                    document.getElementById('game-message').classList.add('text-green-600', 'font-extrabold');
+                    document.getElementById('blow-button').disabled = true;
+                    document.getElementById('game-next-btn').classList.remove('hidden');
+                }
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function () {
+            createBalloons();
+            generateCandles();
+
+            if (typeof updateCountdown === 'function') {
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
+            }
+
+            // Start on the letter page (init-page)
+            showPage('init-page');
+        };
+    </script>
+    <script src="countdown.js"></script>
+</body>
+
+</html>
